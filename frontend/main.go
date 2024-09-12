@@ -84,5 +84,5 @@ func main() {
 	serveDirectory("/js/", "./js", sitesGroup)
 	serveDirectory("/", "./sites", sitesGroup)
 	serveDirectory("/imgs/", "./imgs", sitesGroup)
-	r.Run()
+	r.Run(":8081")
 }
