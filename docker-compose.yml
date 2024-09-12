@@ -2,9 +2,13 @@ services:
   lehrium_backend:
     container_name: lehrium_backend
     environment:
+      - DB_URL=lehrium_db:5432
       - DB_USER=admin
       - DB_PASSWORD=admin
       - DB_NAME=lehrium
+      - UNTIS_USERNAME=..
+      - UNTIS_PASSWORD=..
+      - GIN_PORT=8081
     build:
       context: ./backend
       dockerfile: ./Dockerfile
@@ -20,6 +24,7 @@ services:
     environment:
        - GIN_MODE=release
        - LEHRIUM_FRONTEND_DEBUG=false
+       - GIN_PORT=8081
   lehrium_db:
     image: postgres:latest
     container_name: lehrium_db

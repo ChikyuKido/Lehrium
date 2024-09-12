@@ -3,11 +3,13 @@ package main
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/fs"
 	"mime"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 )
 
@@ -71,18 +73,30 @@ func servePage(path string, diskPath string, r *gin.RouterGroup) {
 	})
 }
 
-func main() {
-	if os.Getenv("LEHRIUM_FRONTEND_DEBUG") != "" {
-		if os.Getenv("LEHRIUM_FRONTEND_DEBUG") == "false" {
-			debug = false
-		}
+func getEnvOrDefault(key string, def string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		return def
 	}
+	return val
+}
 
+func main() {
+	debugVal := getEnvOrDefault("LEHIUM_FRONTEND_DEBUG", "true")
+	debug = debugVal == "true"
+	portVal := getEnvOrDefault("GIN_PORT", "8081")
+	_, portErr := strconv.Atoi(portVal)
+	if portErr != nil {
+		portVal = "8081"
+	}
+	fmt.Println("Start with debug: " + debugVal)
 	r := gin.Default()
 	sitesGroup := r.Group("/")
 	serveDirectory("/css/", "./css", sitesGroup)
 	serveDirectory("/js/", "./js", sitesGroup)
 	serveDirectory("/", "./sites", sitesGroup)
 	serveDirectory("/imgs/", "./imgs", sitesGroup)
-	r.Run(":8081")
+	servePage("/", "./sites/index.html", sitesGroup)
+	fmt.Println("Starting on port " + portVal)
+	r.Run(fmt.Sprintf(":%s", portVal))
 }
