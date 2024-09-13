@@ -69,7 +69,10 @@ paths:
   /user/comment:
     get:
       summary: Comment endpoint
-      description: Adds a comment to a teacher
+      description: |
+        Adds a comment to a teacher
+        
+        This endpoint required the "comment" permission
       tags:
         - user
       requestBody:
@@ -92,10 +95,51 @@ paths:
           description: The user already commented on this teacher
         '404':
           description: Teacher not found
+  /user/rate:
+    get:
+      summary: Rates a teacher
+      description: |
+        Adds a rating to the teacher
+        
+        This endpoint requires the "rate" permission
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                teacherId:
+                  type: integer
+                teachingSkills:
+                  type: number
+                kindness:
+                  type: number
+                engagement:
+                  type: number
+                organization:
+                  type: number
+              required:
+                - teacherId
+                - teachingSkills
+                - kindness
+                - engagement
+                - organization
+      responses:
+        '200':
+          description: Rating added
+        '401':
+          description: The user already rated this teacher
+        '404':
+          description: Teacher not found
   /teacher/list:
     get:
       summary: List all teachers
-      description: Fetch a list of all teachers.
+      description: |
+        Fetch a list of all teachers.
+        
+        This endpoint requires the "viewTeacher" permission
       tags:
         - teacher
       responses:
@@ -120,8 +164,10 @@ paths:
   /teacher/{id}:
     get:
       summary: Get teacher by ID
-      description: Fetch detailed information of a specific teacher by their ID.
+      description: |
+        Fetch detailed information of a specific teacher by their ID.
       
+        This endpoint requires the "viewTeacher" permission
       tags:
         - teacher
       parameters:
