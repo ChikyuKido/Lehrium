@@ -1,0 +1,158 @@
+openapi: 3.0.3
+info:
+  title: Backend
+  description: Backend
+  version: 1.0.0
+paths:
+  /auth/login:
+    post:
+      summary: User login
+      description: Log in a user and return an authentication token.
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jwt:
+                    type: string
+        '401':
+          description: Unauthorized
+
+  /auth/register:
+    post:
+      summary: User registration
+      description: Register a new user.
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                untisName:
+                  type: string
+              required:
+                - email
+                - password
+                - untisName
+      responses:
+        '201':
+          description: User registered
+        '400':
+          description: Bad request
+
+  /user/comment:
+    get:
+      summary: Comment endpoint
+      description: Adds a comment to a teacher
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                teacherId:
+                  type: integer
+                content:
+                  type: string
+              required:
+                - teacherId
+                - content
+      responses:
+        '200':
+          description: Comment created
+        '401':
+          description: The user already commented on this teacher
+        '404':
+          description: Teacher not found
+  /teacher/list:
+    get:
+      summary: List all teachers
+      description: Fetch a list of all teachers.
+      tags:
+        - teacher
+      responses:
+        '200':
+          description: List of teachers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    imageUrl:
+                      type: string
+                    rating:
+                      type: number
+
+  /teacher/{id}:
+    get:
+      summary: Get teacher by ID
+      description: Fetch detailed information of a specific teacher by their ID.
+      
+      tags:
+        - teacher
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Teacher details retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  imageUrl:
+                    type: string
+                  rating:
+                    type: number
+                  teachingSkills:
+                    type: number
+                  kindness:
+                    type: number
+                  engagement:
+                    type: number
+                  organization:
+                    type: number
+        '404':
+          description: Teacher not found
