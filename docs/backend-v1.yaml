@@ -1,15 +1,15 @@
 openapi: 3.0.3
 info:
-  title: Backend
-  description: Backend
+  title: Backend API
+  description: API for user authentication, teacher management, and administrative actions.
   version: 1.0.0
 paths:
   /auth/login:
     post:
-      summary: User login
-      description: Log in a user and return an authentication token.
+      summary: User Login
+      description: Authenticate a user using their email and password, returning a JWT token upon successful login.
       tags:
-        - auth
+        - Authentication
       requestBody:
         required: true
         content:
@@ -19,14 +19,20 @@ paths:
               properties:
                 email:
                   type: string
+                  description: The email address of the user.
                 password:
                   type: string
+                  description: The password of the user.
+                rememberMe:
+                  type: boolean
+                  description: If the users jwt should live longer.
               required:
                 - email
                 - password
+                - rememberMe
       responses:
         '200':
-          description: Successful login
+          description: Successfully authenticated. JWT token is returned.
           content:
             application/json:
               schema:
@@ -34,15 +40,16 @@ paths:
                 properties:
                   jwt:
                     type: string
+                    description: The JWT token for authenticating future requests.
         '401':
-          description: Unauthorized
+          description: Unauthorized. Invalid email or password.
 
   /auth/register:
     post:
-      summary: User registration
-      description: Register a new user.
+      summary: User Registration
+      description: Register a new user by providing their email, password, and their untis username.
       tags:
-        - auth
+        - Authentication
       requestBody:
         required: true
         content:
@@ -52,30 +59,31 @@ paths:
               properties:
                 email:
                   type: string
+                  description: The email address for the new user.
                 password:
                   type: string
+                  description: The password for the new user.
                 untisName:
                   type: string
+                  description: Untis name for the user.
               required:
                 - email
                 - password
                 - untisName
       responses:
         '201':
-          description: User registered
+          description: User successfully registered.
         '400':
-          description: Bad request
+          description: Bad request. Invalid input or missing required fields.
 
   /user/comment:
-    get:
-      summary: Comment endpoint
-      description: |
-        Adds a comment to a teacher
-        
-        This endpoint required the "comment" permission
+    post:
+      summary: Add Comment to a Teacher
+      description: Allows a user to add a comment to a teacher profile. Requires the "comment" permission.
       tags:
-        - user
+        - User
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -83,28 +91,31 @@ paths:
               properties:
                 teacherId:
                   type: integer
+                  description: The unique ID of the teacher to comment on.
                 content:
                   type: string
+                  description: The content of the comment.
               required:
                 - teacherId
                 - content
       responses:
         '200':
-          description: Comment created
-        '401':
-          description: The user already commented on this teacher
+          description: Comment successfully added.
+        '400':
+          description: User has already commented on this teacher.
+        '403':
+          description: User does not have permission to comment on teachers.
         '404':
-          description: Teacher not found
+          description: Teacher not found.
+
   /user/rate:
-    get:
-      summary: Rates a teacher
-      description: |
-        Adds a rating to the teacher
-        
-        This endpoint requires the "rate" permission
+    post:
+      summary: Rate a Teacher
+      description: Submit a rating for a teacher based on various criteria. Requires the "rate" permission.
       tags:
-        - user
+        - User
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -112,14 +123,19 @@ paths:
               properties:
                 teacherId:
                   type: integer
+                  description: The unique ID of the teacher to be rated.
                 teachingSkills:
                   type: number
+                  description: Rating for teaching skills (1-5).
                 kindness:
                   type: number
+                  description: Rating for kindness (1-5).
                 engagement:
                   type: number
+                  description: Rating for engagement (1-5).
                 organization:
                   type: number
+                  description: Rating for organization (1-5).
               required:
                 - teacherId
                 - teachingSkills
@@ -128,23 +144,76 @@ paths:
                 - organization
       responses:
         '200':
-          description: Rating added
-        '401':
-          description: The user already rated this teacher
+          description: Rating successfully submitted.
+        '400':
+          description: User has already rated this teacher.
+        '403':
+          description: User does not have permission to rate teachers.
         '404':
-          description: Teacher not found
+          description: Teacher not found.
+
   /teacher/list:
     get:
-      summary: List all teachers
-      description: |
-        Fetch a list of all teachers.
-        
-        This endpoint requires the "viewTeacher" permission
+      summary: List All Teachers
+      description: Retrieve a list of all teachers in the system. Requires the "viewTeacher" permission.
       tags:
-        - teacher
+        - Teacher
+      parameters:
+        - name: sortBy
+          in: query
+          description: Specify the attribute to sort by. Options are "name" or "avgRating".
+          required: false
+          schema:
+            type: string
+            default: name
+            enum:
+              - name
+              - avgRating
+        - name: sortOrder
+          in: query
+          description: Specify the sort order. Options are "desc" or "asc".
+          required: false
+          schema:
+            type: string
+            default: asc
+            enum:
+              - desc
+              - asc
+        - name: onlyMyTeachers
+          in: query
+          description: Filter to show only teachers assigned to the current user.
+          required: false
+          schema:
+            default: false
+            type: boolean
+        - name: aboveRating
+          in: query
+          description: Filter teachers with an average rating above the specified value (from 1 to 5).
+          required: false
+          schema:
+            type: number
+            format: float
+            minimum: 1
+            maximum: 5
+        - name: limit
+          in: query
+          description: Number of teachers to return in the response.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: offset
+          in: query
+          description: Number of teachers to skip from the start.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
       responses:
         '200':
-          description: List of teachers
+          description: A list of teachers is returned.
           content:
             application/json:
               schema:
@@ -154,31 +223,35 @@ paths:
                   properties:
                     id:
                       type: string
+                      description: The unique identifier of the teacher.
                     name:
                       type: string
+                      description: The name of the teacher.
                     imageUrl:
                       type: string
+                      description: URL of the teacher's profile picture.
                     rating:
                       type: number
+                      description: Average rating of the teacher.
+        '403':
+          description: User does not have permission to view teachers.
 
   /teacher/{id}:
     get:
-      summary: Get teacher by ID
-      description: |
-        Fetch detailed information of a specific teacher by their ID.
-      
-        This endpoint requires the "viewTeacher" permission
+      summary: Get Teacher by ID
+      description: Retrieve detailed information about a specific teacher using their ID. Requires the "viewTeacher" permission.
       tags:
-        - teacher
+        - Teacher
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+          description: The unique identifier of the teacher.
       responses:
         '200':
-          description: Teacher details retrieved
+          description: Teacher details successfully retrieved.
           content:
             application/json:
               schema:
@@ -186,19 +259,224 @@ paths:
                 properties:
                   id:
                     type: string
+                    description: The unique identifier of the teacher.
                   name:
                     type: string
+                    description: The name of the teacher.
                   imageUrl:
                     type: string
+                    description: URL of the teacher's profile picture.
                   rating:
                     type: number
+                    description: Average rating of the teacher.
                   teachingSkills:
                     type: number
+                    description: Rating for teaching skills (1-5).
                   kindness:
                     type: number
+                    description: Rating for kindness (1-5).
                   engagement:
                     type: number
+                    description: Rating for engagement (1-5).
                   organization:
                     type: number
+                    description: Rating for organization (1-5).
+        '403':
+          description: User does not have permission to view this teacher.
         '404':
-          description: Teacher not found
+          description: Teacher not found.
+
+  /teacher/{id}/getComments:
+    get:
+      summary: Get Comments for a Teacher
+      description: Retrieve comments submitted for a specific teacher. Requires the "viewTeacher" permission.
+      tags:
+        - Teacher
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the teacher.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Limit the number of comments returned.
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Number of comments to skip.
+      responses:
+        '200':
+          description: Comments successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  commentId:
+                    type: string
+                    description: The unique identifier of the comment.
+                  commentContent:
+                    type: string
+                    description: The content of the comment.
+                  creationDate:
+                    type: integer
+                    description: Creation date as a Unix timestamp (UTC).
+        '403':
+          description: User does not have permission to view comments.
+        '404':
+          description: Teacher not found.
+
+  /teacher/{id}/getRatings:
+    get:
+      summary: Get Ratings for a Teacher
+      description: Retrieve ratings submitted for a specific teacher. Requires the "viewTeacher" permission.
+      tags:
+        - Teacher
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the teacher.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Limit the number of ratings returned.
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Number of ratings to skip.
+      responses:
+        '200':
+          description: Ratings successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ratingId:
+                    type: string
+                    description: The unique identifier of the rating.
+                  teachingSkills:
+                    type: integer
+                    description: Rating for teaching skills (1-5).
+                  kindness:
+                    type: integer
+                    description: Rating for kindness (1-5).
+                  engagement:
+                    type: integer
+                    description: Rating for engagement (1-5).
+                  organization:
+                    type: integer
+                    description: Rating for organization (1-5).
+                  creationDate:
+                    type: integer
+                    description: Creation date as a Unix timestamp (UTC).
+        '403':
+          description: User does not have permission to view ratings.
+        '404':
+          description: Teacher not found.
+  /admin/deleteComment:
+    delete:
+      summary: Remove a comment from a teacher
+      description: |
+        This endpoint removes a specific comment associated with a teacher. 
+        
+        To use this endpoint, the user must have the "deleteComment" permission.
+      tags:
+        - Admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                commentId:
+                  type: integer
+              required:
+                - commentId
+      responses:
+        '200':
+          description: Comment successfully deleted
+        '403':
+          description: User does not have permission to delete comments
+        '404':
+          description: The specified commentId does not exist
+
+  /admin/deleteRating:
+    delete:
+      summary: Remove a rating from a teacher
+      description: |
+        This endpoint removes a specific rating associated with a teacher.
+        
+        To use this endpoint, the user must have the "deleteRating" permission.
+      tags:
+        - Admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ratingId:
+                  type: integer
+              required:
+                - ratingId
+      responses:
+        '200':
+          description: Rating successfully deleted
+        '403':
+          description: User does not have permission to delete ratings
+        '404':
+          description: The specified ratingId does not exist
+  # permission listUsers
+  /admin/listUsers:
+    get:
+      tags:
+        - Admin
+  # permission Admin
+  /admin/deleteUser/{id}:
+    delete:
+      tags:
+        - Admin
+  # permission Admin
+  /admin/changeRoles/{id}:
+    put:
+      tags:
+        - Admin
+  # permission list teachers
+  /admin/listTeachers:
+    get:
+      tags:
+        - Admin
+  # permission admin
+  /admin/deleteTeacher/{id}:
+    delete:
+      tags:
+        - Admin
+  # permission admin
+  /admin/updateTeacher/{id}:
+    put:
+      tags:
+        - Admin
+  # permission statistics. Return teacherCount,UserCount,Comment count, rating count
+  /admin/statistics:
+    get:
+      tags:
+        - Admin
