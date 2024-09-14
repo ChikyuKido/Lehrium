@@ -19,7 +19,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.GET("/health", s.healthHandler)
     
-    auth.POST("/login", controllers.GenerateToken)
+    auth.POST("/login", controllers.LoginUser)
     auth.POST("/register", controllers.RegisterUser)
 
     user.GET("/comment", nil)

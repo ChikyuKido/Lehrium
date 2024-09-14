@@ -18,11 +18,13 @@ type JWTClaim struct {
     jwt.StandardClaims
 }
 
-func GenerateJWT(email string, untisName string) (tokenString string, err error) {
+func GenerateJWT(email string, persistantLogin bool) (tokenString string , err error) {
     expirationTime := time.Now().Add(24 * time.Hour)
+    if persistantLogin {
+        expirationTime = time.Now().Add(2160 * time.Hour)
+    }
     claims:= &JWTClaim{
         Email: email,
-        UntisName: untisName,
         StandardClaims: jwt.StandardClaims{
             ExpiresAt: expirationTime.Unix(),
         },
@@ -37,7 +39,7 @@ func ValidateToken(signedToken string) (err error) {
         signedToken,
         &JWTClaim{},
         func(token *jwt.Token) (interface{}, error) {
-            return []byte(jwtSecret), nil
+            return jwtSecret, nil
         },
     )
     if err != nil {
