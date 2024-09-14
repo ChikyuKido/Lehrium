@@ -2,12 +2,18 @@ package models
 
 import (
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+    "github.com/lib/pq"
 )
+
 type User struct {
-    ID          int
-    Email       string  `json:"email"`
-    Password    string  `json:"password"`
-    UntisName   string  `json:"untisName"`
+    gorm.Model
+    ID              uint    `gorm:"primaryKey"`
+    Email           string  `json:"email" gorm:"size:255;unique"`
+    Password        string  `json:"password" gorm:"size:255"`
+    UntisName       string  `json:"untisName" gorm:"size:100;unique"`
+    Roles           pq.StringArray `gorm:"type:varchar(50)[]"`
+    TeacherIDs      pq.Int64Array `gorm:"type:integer[]"`
 }
 
 func (user *User) HashPassword(password string) error {
