@@ -2,6 +2,8 @@ package models
 
 import (
     "time"
+	"gorm.io/gorm"
+    "github.com/lib/pq"
 )
 
 type Teacher struct {
@@ -34,3 +36,15 @@ type Rating struct {
     Organization   int       `gorm:"check:organization >= 1 AND organization <= 10"`
     Teacher        Teacher   `gorm:"foreignKey:TeacherID"`
 }
+
+
+type User struct {
+    gorm.Model
+    ID              uint    `gorm:"primaryKey"`
+    Email           string  `json:"email" gorm:"size:255;unique"`
+    Password        string  `json:"password" gorm:"size:255"`
+    UntisName       string  `json:"untisName" gorm:"size:100;unique"`
+    Roles           pq.StringArray `gorm:"type:varchar(50)[]"`
+    TeacherIDs      pq.Int64Array `gorm:"type:integer[]"`
+}
+
