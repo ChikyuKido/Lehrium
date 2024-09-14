@@ -1,27 +1,16 @@
 package main
 
-import(
-    "github.com/gin-gonic/gin"
-    "os"
-    "fmt"
-    "strconv"
-) 
-
-func getEnvOrDefault(key string, def string) string {
-	val := os.Getenv(key)
-	if val == "" {
-		return def
-	}
-	return val
-}
+import (
+	"lehrium-backend/internal/server"
+	"fmt"
+)
 
 func main() {
-	portVal := getEnvOrDefault("GIN_PORT", "8080")
-	_, portErr := strconv.Atoi(portVal)
-	if portErr != nil {
-		portVal = "8081"
+
+	server := server.NewServer()
+
+	err := server.ListenAndServe()
+	if err != nil {
+		panic(fmt.Sprintf("cannot start server: %s", err))
 	}
-	r := gin.Default()
-	fmt.Println("Starting on port " + portVal)
-	r.Run(fmt.Sprintf(":%s", portVal))
 }
