@@ -30,10 +30,10 @@ type Rating struct {
     ID             uint      `gorm:"primaryKey"`
     TeacherID      uint      `gorm:"index"`
     CreationDate   time.Time `gorm:"type:date"`
-    TeachingSkills int       `gorm:"check:teachingSkills >= 1 AND teachingSkills <= 10"`
-    Kindness       int       `gorm:"check:kindness >= 1 AND kindness <= 10"`
-    Engagement     int       `gorm:"check:engagement >= 1 AND engagement <= 10"`
-    Organization   int       `gorm:"check:organization >= 1 AND organization <= 10"`
+    TeachingSkills int       `gorm:"check:teachingSkills >= 1 AND teachingSkills <= 5"`
+    Kindness       int       `gorm:"check:kindness >= 1 AND kindness <= 5"`
+    Engagement     int       `gorm:"check:engagement >= 1 AND engagement <= 5"`
+    Organization   int       `gorm:"check:organization >= 1 AND organization <= 5"`
     Teacher        Teacher   `gorm:"foreignKey:TeacherID"`
 }
 
