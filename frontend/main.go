@@ -94,7 +94,7 @@ func main() {
 	fmt.Println("Start with debug: " + debugVal)
 
 	config := cors.DefaultConfig()
-	config.AllowCredentials = false
+	config.AllowCredentials = true
 	config.AllowAllOrigins = true
 
 	r := gin.Default()
