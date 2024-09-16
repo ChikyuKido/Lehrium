@@ -3,6 +3,8 @@ info:
   title: Backend API
   description: API for user authentication, teacher management, and administrative actions.
   version: 1.0.0
+servers:
+  - url: http://localhost:8080/api/v1
 paths:
   /auth/login:
     post:
