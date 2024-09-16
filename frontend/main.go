@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 	"io/fs"
 	"mime"
 	"os"
@@ -92,13 +93,15 @@ func main() {
 	}
 	fmt.Println("Start with debug: " + debugVal)
 
+	config := cors.DefaultConfig()
+	config.AllowCredentials = false
+	config.AllowAllOrigins = true
+
 	r := gin.Default()
+	r.Use(cors.New(config))
 
 	// CORS Middleware
 	r.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*") // hab das hier hinzugefuegt, weil ich immer cors error hatte
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Content-Type")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204) // No content for OPTIONS request
