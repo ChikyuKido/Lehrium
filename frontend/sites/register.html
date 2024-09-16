@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="../css/bulma.css">
+</head>
+<body>
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-half">
+                <div class="box">
+                    <h1 class="title has-text-centered">Register</h1>
+                    <form id="register-form">
+                        <div class="field">
+                            <label class="label">Email</label>
+                            <div class="control">
+                                <input class="input" type="email" id="email" placeholder="Your Email" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Password</label>
+                            <div class="control">
+                                <input class="input" type="password" id="password" placeholder="Your Password" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Confirm Password</label>
+                            <div class="control">
+                                <input class="input" type="password" placeholder="Confirm Your Password" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Untisname</label>
+                            <div class="control">
+                                <input class="input" type="text" id="untisName" placeholder="Your Untisname" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <button class="button is-primary is-fullwidth" type="submit" id="submit">Register</button>
+                            </div>
+                        </div>
+                        <div class="has-text-centered">
+                            <p>Already have an account? <a href="login.html">Login here</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/register.js"></script>
+</body>
+</html>

@@ -62,6 +62,7 @@ func serveDirectory(rootPath string, baseDir string, r *gin.RouterGroup) {
 		return nil
 	})
 }
+
 func servePage(path string, diskPath string, r *gin.RouterGroup) {
 	r.GET(path, func(c *gin.Context) {
 		content := getCachedContent(path, diskPath)
@@ -90,13 +91,32 @@ func main() {
 		portVal = "8081"
 	}
 	fmt.Println("Start with debug: " + debugVal)
+
 	r := gin.Default()
+
+	// CORS Middleware
+	r.Use(func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*") // hab das hier hinzugefuegt, weil ich immer cors error hatte
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Content-Type")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204) // No content for OPTIONS request
+			return
+		}
+
+		c.Next()
+	})
+
 	sitesGroup := r.Group("/")
 	serveDirectory("/css/", "./css", sitesGroup)
 	serveDirectory("/js/", "./js", sitesGroup)
 	serveDirectory("/", "./sites", sitesGroup)
 	serveDirectory("/imgs/", "./imgs", sitesGroup)
 	servePage("/", "./sites/index.html", sitesGroup)
+	servePage("/login", "./sites/login.html", sitesGroup)
+	servePage("/register", "./sites/register.html", sitesGroup)
+
 	fmt.Println("Starting on port " + portVal)
 	r.Run(fmt.Sprintf(":%s", portVal))
 }
