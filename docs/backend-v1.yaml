@@ -76,7 +76,7 @@ paths:
         '201':
           description: User successfully registered.
         '400':
-          description: Bad request. Invalid input or missing required fields.
+          description: Bad request. Invalid input or missing required fields. Or account with the email already exists.
 
   /user/comment:
     post:
