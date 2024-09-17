@@ -93,24 +93,6 @@ func main() {
 	}
 	fmt.Println("Start with debug: " + debugVal)
 
-	config := cors.DefaultConfig()
-	config.AllowCredentials = true
-	config.AllowAllOrigins = true
-
-	r := gin.Default()
-	r.Use(cors.New(config))
-
-	// CORS Middleware
-	r.Use(func(c *gin.Context) {
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204) // No content for OPTIONS request
-			return
-		}
-
-		c.Next()
-	})
-
 	sitesGroup := r.Group("/")
 	serveDirectory("/css/", "./css", sitesGroup)
 	serveDirectory("/js/", "./js", sitesGroup)
