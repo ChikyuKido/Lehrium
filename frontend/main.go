@@ -97,6 +97,12 @@ func main() {
 	serveDirectory("/", "./sites", sitesGroup)
 	serveDirectory("/imgs/", "./imgs", sitesGroup)
 	servePage("/", "./sites/index.html", sitesGroup)
+	servePage("/login", "./sites/login.html", sitesGroup)
+	servePage("/register", "./sites/register.html", sitesGroup)
+	servePage("/succesfullLogin", "./sites/succesfullLogin.html", sitesGroup)
+	servePage("/succesfullRegister", "./sites/succesfullRegister.html", sitesGroup)
 	fmt.Println("Starting on port " + portVal)
 	r.Run(fmt.Sprintf(":%s", portVal))
 }
+
+
