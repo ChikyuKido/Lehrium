@@ -1,4 +1,7 @@
-FROM golang:1.23 AS builder
+FROM golang:1.23.1-alpine AS builder
+
+
+RUN apk add --no-cache upx
 
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
 
@@ -11,7 +14,9 @@ COPY . .
 
 RUN go build -ldflags="-s -w" lehrium-frontend
 
-FROM debian:bookworm-slim
+RUN upx --best --lzma lehrium-frontend
+
+FROM alpine:latest
 
 COPY --from=builder /app/lehrium-frontend /app/lehrium-frontend
 COPY --from=builder /app/css /app/css

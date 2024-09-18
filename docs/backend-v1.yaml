@@ -9,7 +9,9 @@ paths:
   /auth/login:
     post:
       summary: User Login
-      description: Authenticate a user using their email and password, returning a JWT token upon successful login.
+      description: |
+        Authenticate a user using their email and password, returning a JWT token upon successful login.
+        Needs the login role
       tags:
         - Authentication
       requestBody:
@@ -45,6 +47,8 @@ paths:
                     description: The JWT token for authenticating future requests.
         '401':
           description: Unauthorized. Invalid email or password.
+        '403':
+          description: Email not verified. Please verify your email to login
 
   /auth/register:
     post:
@@ -77,6 +81,29 @@ paths:
           description: User successfully registered.
         '400':
           description: Bad request. Invalid input or missing required fields. Or account with the email already exists.
+  /auth/verifyEmail:
+    post:
+      summary: Verifies user email
+      description: Takes the uuid from the body and checks if a user tried to register with that uuid and then activate his account
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+                  description: The uuid from the user to verify
+              required:
+                - uuid
+      responses:
+        '200':
+          description: Successfully verified the email and activated the account
+        '400':
+          description: Bad request. User with uuid does not exists or email verification link expired
 
   /user/comment:
     post:

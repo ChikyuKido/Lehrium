@@ -1,4 +1,6 @@
-FROM golang:1.23 AS builder
+FROM golang:1.23.1-alpine AS builder
+
+RUN apk add --no-cache upx
 
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
 
@@ -9,9 +11,11 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -ldflags="-s -w" lehrium-backend
+RUN go build -ldflags="-s -w" -o lehrium-backend
 
-FROM debian:bookworm-slim
+RUN upx --best --lzma lehrium-backend
+
+FROM alpine:latest
 
 COPY --from=builder /app/lehrium-backend /app/lehrium-backend
 

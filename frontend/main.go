@@ -82,7 +82,7 @@ func getEnvOrDefault(key string, def string) string {
 }
 
 func main() {
-	debugVal := getEnvOrDefault("LEHIUM_FRONTEND_DEBUG", "true")
+	debugVal := getEnvOrDefault("LEHRIUM_FRONTEND_DEBUG", "true")
 	debug = debugVal == "true"
 	portVal := getEnvOrDefault("GIN_PORT", "8081")
 	_, portErr := strconv.Atoi(portVal)
@@ -104,5 +104,3 @@ func main() {
 	fmt.Println("Starting on port " + portVal)
 	r.Run(fmt.Sprintf(":%s", portVal))
 }
-
-
