@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="../css/bulma.css">
+    <link rel="stylesheet" href="/css/bulma.css">
 </head>
 <body>
     <div class="container">
@@ -12,7 +12,7 @@
             <div class="column is-half is-offset-one-quarter">
                 <div class="box">
                     <h1 class="title has-text-centered">Login</h1>
-                    <form id="login-form">
+                    <form id="login-form" action="/login" method="post">
                         <div class="field">
                             <label class="label">Email</label>
                             <div class="control">
@@ -26,9 +26,10 @@
                             </div>
                         </div>
                         <div class="field">
-                            <label class="label">Untis Name</label>
                             <div class="control">
-                                <input class="input" id="untisName" name="untisName" placeholder="your webuntis user account" required>
+                                <label>
+                                    <input type="checkbox" id="remember_me" name="remember_me" /> Remember Me
+                                </label>
                             </div>
                         </div>
                         <div class="field">
@@ -48,3 +49,4 @@
     <script src="/js/login.js"></script>
 </body>
 </html>
+

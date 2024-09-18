@@ -3,12 +3,11 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const untisName = document.getElementById('untisName').value;
+    const rememberMe = document.getElementById('remember_me').checked;
 
     const loginData = {
         email: email,
         password: password,
-        untisName: untisName
     };
 
     try {
@@ -23,7 +22,11 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
 
         if (response.ok) {
             const result = await response.json();
+            if (rememberMe == true) {
+                localStorage.setItem("login_token", result.token);
+            }
             console.log('Response JSON:', result);
+            window.location.replace("/succesfullLogin");
         } else {
             const errorText = await response.text();
             console.error('Error:', response.statusText);
