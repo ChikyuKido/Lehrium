@@ -19,37 +19,30 @@ var (
 	debug      = true
 )
 
-func getCachedContent(path string, diskPath string) []byte {
+func getCachedContent(path string, filepath string) []byte {
 	if debug {
-		content, err := os.ReadFile(diskPath)
+		content, err := os.ReadFile(filepath)
 		if err != nil {
 			return nil
 		}
 		return content
 	}
-
 	cacheMutex.Lock()
 	defer cacheMutex.Unlock()
 	if content, found := cache[path]; found {
 		return content
 	}
-
-	content, err := os.ReadFile(diskPath)
+	content, err := os.ReadFile(filepath)
 	if err != nil {
 		return nil
 	}
-
 	var compressedContent bytes.Buffer
-	writer := gzip.NewWriter(&compressedContent)
-	defer writer.Close()
+	writer, _ := gzip.NewWriterLevel(&compressedContent, gzip.BestCompression)
 	_, err = writer.Write(content)
 	if err != nil {
 		return nil
 	}
-
-	if err := writer.Close(); err != nil {
-		return nil
-	}
+	writer.Close()
 
 	compressedData := compressedContent.Bytes()
 	cache[path] = compressedData
@@ -69,14 +62,9 @@ func serveDirectory(rootPath string, baseDir string, r *gin.RouterGroup) {
 		return nil
 	})
 }
-
 func servePage(path string, diskPath string, r *gin.RouterGroup) {
 	r.GET(path, func(c *gin.Context) {
 		content := getCachedContent(path, diskPath)
-		if content == nil {
-			c.Status(404)
-			return
-		}
 		contentType := mime.TypeByExtension(filepath.Ext(diskPath))
 		if !debug {
 			c.Header("Content-Encoding", "gzip")
@@ -94,17 +82,15 @@ func getEnvOrDefault(key string, def string) string {
 }
 
 func main() {
-	r := gin.Default()
-
 	debugVal := getEnvOrDefault("LEHIUM_FRONTEND_DEBUG", "true")
 	debug = debugVal == "true"
 	portVal := getEnvOrDefault("GIN_PORT", "8081")
-
-	if _, portErr := strconv.Atoi(portVal); portErr != nil {
+	_, portErr := strconv.Atoi(portVal)
+	if portErr != nil {
 		portVal = "8081"
 	}
 	fmt.Println("Start with debug: " + debugVal)
-
+	r := gin.Default()
 	sitesGroup := r.Group("/")
 	serveDirectory("/css/", "./css", sitesGroup)
 	serveDirectory("/js/", "./js", sitesGroup)
@@ -115,9 +101,8 @@ func main() {
 	servePage("/register", "./sites/register.html", sitesGroup)
 	servePage("/succesfullLogin", "./sites/succesfullLogin.html", sitesGroup)
 	servePage("/succesfullRegister", "./sites/succesfullRegister.html", sitesGroup)
-
 	fmt.Println("Starting on port " + portVal)
-	if err := r.Run(fmt.Sprintf(":%s", portVal)); err != nil {
-		fmt.Println("Failed to start server:", err)
-	}
+	r.Run(fmt.Sprintf(":%s", portVal))
 }
+
+

@@ -8,6 +8,7 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
     const loginData = {
         email: email,
         password: password,
+        rememberme: rememberMe
     };
 
     try {
@@ -22,9 +23,7 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
 
         if (response.ok) {
             const result = await response.json();
-            if (rememberMe == true) {
-                localStorage.setItem("login_token", result.token);
-            }
+            localStorage.setItem("login_token", result.token);
             console.log('Response JSON:', result);
             window.location.replace("/succesfullLogin");
         } else {

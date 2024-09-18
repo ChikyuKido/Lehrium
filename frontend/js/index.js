@@ -1,7 +1,6 @@
 window.onload = function() {
-    const token = localStorage.getItem('login_token'); // Get the token from localStorage
-
-    if (token !== null) { // Check if the token is not null
+    const token = localStorage.getItem('login_token');
+    if (token !== null) {
         console.log('Token found:', token);
         window.location.replace("/succesfullLogin");
     } else {
