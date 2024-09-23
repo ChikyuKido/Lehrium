@@ -20,6 +20,7 @@ services:
       - DB_PASSWORD=admin
       - DB_DATABASE=lehrium
       - DB_SCHEMA=public
+      - LEHRIUM_FRONTEND_URL=localhost:8080
       - UNTIS_USERNAME=..
       - UNTIS_PASSWORD=..
       - PORT=8080
@@ -41,6 +42,7 @@ services:
     environment:
        - GIN_MODE=release
        - LEHRIUM_FRONTEND_DEBUG=false
+       - LEHRIUM_BACKEND_ADDRESS=localhost:8080
        - GIN_PORT=8081
     depends_on:
       - lehrium_backend

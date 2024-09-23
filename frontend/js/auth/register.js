@@ -21,7 +21,7 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    window.location.replace("/succesfullRegister");
+                    window.location.replace("/auth/succesfullRegister");
                     console.log('Success:', result);
                 } else {
                     console.error('Error:', response.statusText);
