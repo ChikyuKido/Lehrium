@@ -25,7 +25,7 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
             const result = await response.json();
             localStorage.setItem("login_token", result.token);
             console.log('Response JSON:', result);
-            window.location.replace("/succesfullLogin");
+            window.location.replace("/auth/succesfullLogin");
         } else {
             const errorText = await response.text();
             console.error('Error:', response.statusText);

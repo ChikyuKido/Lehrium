@@ -104,7 +104,19 @@ paths:
           description: Successfully verified the email and activated the account
         '400':
           description: Bad request. User with uuid does not exists or email verification link expired
-
+  /auth/requestEmailVerification:
+    post:
+      summary: Sends the logged in user a email with a verification link
+      description: Checks if the user is logged in if yes. Check if the user is not verified yet if yes then send an email to the user with a verification link. To prevent spamming this endpoint has a 5min cooldown
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: Successfully sent the email
+        '401':
+          description: User is not logged in
+        '400':
+          description: Already verified. Or. You can only send a verification link every 5 minutes
   /user/comment:
     post:
       summary: Add Comment to a Teacher
