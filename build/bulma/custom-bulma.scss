@@ -1,0 +1,28 @@
+// Define custom color palette
+$orange: #ff6600;
+$orange-light: #ffa64d;
+$orange-dark: #cc5200;
+$gold: #ffd700;
+$bronze: #cd7f32;
+$peach: #ffcc99;
+$terracotta: #e2725b;
+$white: #ffffff;
+$grey-dark: #4a4a4a;
+
+// Override Bulma's default colors
+@use "sass/index" with (
+  $primary: $orange,
+  
+  $link: $bronze,
+  $info: $peach,
+  $success: $gold,
+  $warning: $terracotta,
+  $danger: $orange-dark,
+
+  // Update grey colors
+  $grey: $grey-dark,
+  $grey-light: $peach,
+
+  // Customize other colors if necessary
+  $background: $white
+);
