@@ -1,2 +1,2 @@
-build/bulma/sass/* linguist-vendored=false
-frontend/css/ linguist-vendored=false
+build/bulma/sass/* linguist-vendored
+frontend/css/ linguist-vendored
