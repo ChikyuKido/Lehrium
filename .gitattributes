@@ -1,2 +1,2 @@
-build/bulma/sass/* linguist-vendored
+build-tools/* linguist-vendored
 frontend/css/* linguist-vendored

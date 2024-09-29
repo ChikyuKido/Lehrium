@@ -1,16 +1,23 @@
 FROM golang:1.23.1-alpine AS builder
 
+RUN apk add --no-cache upx nodejs npm
 
-RUN apk add --no-cache upx
+RUN npm install -g uncss
 
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
 
 WORKDIR /app
 
+COPY . .
+
+RUN mkdir temp
+RUN find sites -name "*.html" -exec cp {} temp \;
+RUN cp -R css temp/
+RUN uncss temp/*.html > css/bulma.css
+RUN rm -rf temp
+
 COPY go.mod go.sum ./
 RUN go mod download
-
-COPY . .
 
 RUN go build -ldflags="-s -w" lehrium-frontend
 
