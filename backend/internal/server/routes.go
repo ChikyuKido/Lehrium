@@ -1,9 +1,10 @@
 package server
 
 import (
-    "lehrium-backend/internal/controller"
-    "lehrium-backend/internal/middleware"
-    "net/http"
+	"lehrium-backend/internal/controller"
+	middlewares "lehrium-backend/internal/middleware"
+	"net/http"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -16,22 +17,23 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
 	r.Use(cors.New(config))
 
-    api := r.Group("/api/v1")
-    auth := api.Group("/auth")
-    user := api.Group("/user").Use(middlewares.Auth())
-    teacher := api.Group("/teacher").Use(middlewares.Auth())
+	api := r.Group("/api/v1")
+	auth := api.Group("/auth")
+	user := api.Group("/user").Use(middlewares.Auth())
+	teacher := api.Group("/teacher").Use(middlewares.Auth())
 
 	r.GET("/health", s.healthHandler)
-    
-    auth.POST("/login", controllers.LoginUser)
-    auth.POST("/register", controllers.RegisterUser)
-    //auth.POST("/verifyEmail", controllers.VerifyUser)
 
-    user.GET("/comment", nil)
-    user.GET("/rate", nil)
+	auth.POST("/login", controller.LoginUser)
+	auth.POST("/register", controller.RegisterUser)
+	auth.POST("/verifyEmail", controller.VerifyEmail)
+	auth.POST("/requestEmailVerification", controller.SendNewVerificationEmail)
 
-    teacher.GET("/list", nil)
-    teacher.GET("/:id", nil)
+	user.GET("/comment", nil)
+	user.GET("/rate", nil)
+
+	teacher.GET("/list", nil)
+	teacher.GET("/:id", nil)
 
 	return r
 }

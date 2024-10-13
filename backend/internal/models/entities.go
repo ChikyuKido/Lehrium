@@ -1,9 +1,10 @@
 package models
 
 import (
-    "time"
+	"time"
+
+	"github.com/lib/pq"
 	"gorm.io/gorm"
-    "github.com/lib/pq"
 )
 
 type Teacher struct {
@@ -46,13 +47,14 @@ type User struct {
     Roles           pq.StringArray `gorm:"type:varchar(50)[]"`
     TeacherIDs      pq.Int64Array `gorm:"type:integer[]"`
     Verified        bool    `json:"isVerified" gorm:"type:boolean"`
+    LastVerifEmailSent	string	`json:"lastVerifEmailSent"`
     UUID            string  `json:"uuid" gorm:"size:255:unique"`
     RatedTeachers   []bool  `json:"ratedTeacehrs" gorm:"type:bool[]"`
 }
 
 type Verification struct {
     gorm.Model
-    UserID  uint    
+    UserID  uint
     UUID    string
     ExpDate string
 }

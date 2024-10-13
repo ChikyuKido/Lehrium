@@ -1,17 +1,13 @@
-package controllers
+package controller
 
 import (
 	"lehrium-backend/internal/auth"
 	"lehrium-backend/internal/database"
 	"lehrium-backend/internal/models"
-	"log"
 	"net/http"
-	"net/smtp"
 	"time"
 
 	//    "regexp"
-	"os"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	_ "github.com/joho/godotenv/autoload"
@@ -32,7 +28,7 @@ func RegisterUser(context *gin.Context) {
 
 	userAuth.UUID = user.UUID
 	userAuth.UserID = user.ID
-	userAuth.ExpDate = time.Now().Add(time.Hour).String()
+	userAuth.ExpDate = time.Now().Add(time.Minute * 5).String()
 	// Bind the incoming JSON data to the user struct
 	if err := context.ShouldBindJSON(&user); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -71,7 +67,7 @@ func RegisterUser(context *gin.Context) {
 	if authenticationRecord.Error != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": authenticationRecord.Error.Error()})
 	}
-	sendVerificationEmail(user.Email)
+	sendFirstVerificationEmail(user.UUID, user.Email)
 
 	// If the user is successfully created, return a success response
 	context.JSON(http.StatusCreated, gin.H{"message": "Successfully created"})
@@ -106,32 +102,4 @@ func LoginUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
-}
-
-func VerifyEmail(c *gin.Context) {
-
-	return
-}
-
-func sendVerificationEmail(userEmail string) {
-	from := os.Getenv("GMAIL_USERNAME")
-	pass := os.Getenv("GMAIL_APPPASSWORD")
-	to := userEmail
-
-	msg := "From: Lehrium Verification" + "\n" +
-		"To: " + to + "\n" +
-		"Subject: Lehrium Account verification\n\n" +
-		"please verify your account via this link: " +
-		""
-
-	err := smtp.SendMail("smtp.gmail.com:587",
-		smtp.PlainAuth("", from, pass, "smtp.gmail.com"),
-		from, []string{to}, []byte(msg))
-
-	if err != nil {
-		log.Printf("smtp error: %s", err)
-		return
-	}
-	log.Println("Successfully sended to " + to)
-
 }
