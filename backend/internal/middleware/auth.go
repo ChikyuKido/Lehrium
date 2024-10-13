@@ -1,4 +1,5 @@
 package middlewares
+
 import (
   "lehrium-backend/internal/auth"
   "github.com/gin-gonic/gin"

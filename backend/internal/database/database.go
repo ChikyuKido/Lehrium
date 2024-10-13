@@ -50,11 +50,12 @@ func New() Service {
 		log.Fatal("Failed to connect to database:", err)
 	}
     
-    err = db.AutoMigrate(&models.User{})
+    err = db.AutoMigrate(&models.User{}, &models.Comment{}, &models.Rating{}, &models.Teacher{}, &models.Verification{})
     if err != nil {
         log.Fatalf("Failed to migrate database: %v", err)
     }
-	dbInstance = &service{
+
+    dbInstance = &service{
 		db: db,
 	}
 	return dbInstance
