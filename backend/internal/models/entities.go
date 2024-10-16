@@ -47,8 +47,6 @@ type User struct {
     Roles           pq.StringArray `gorm:"type:varchar(50)[]"`
     TeacherIDs      pq.Int64Array `gorm:"type:integer[]"`
     Verified        bool    `json:"isVerified" gorm:"type:boolean"`
-    LastVerifEmailSent	string	`json:"lastVerifEmailSent"`
-    UUID            string  `json:"uuid" gorm:"size:255:unique"`
     RatedTeachers   []bool  `json:"ratedTeacehrs" gorm:"type:bool[]"`
 }
 

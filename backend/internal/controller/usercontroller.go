@@ -13,20 +13,14 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-type TokenRequest struct {
-	Email      string `json:"email"`
-	Password   string `json:"password"`
-	RememberMe bool   `json:"rememberme"`
-}
 
 func RegisterUser(context *gin.Context) {
 	var user models.User
 	var userAuth models.Verification
 
-	user.UUID = uuid.NewString()
+	userAuth.UUID = uuid.NewString()
 	user.Verified = false
 
-	userAuth.UUID = user.UUID
 	userAuth.UserID = user.ID
 	userAuth.ExpDate = time.Now().Add(time.Minute * 5).String()
 	// Bind the incoming JSON data to the user struct
@@ -37,17 +31,6 @@ func RegisterUser(context *gin.Context) {
 	}
 	// check auf Email Domain
 	/*
-	   email_match, err := regexp.MatchString(`@spengergasse\.at$`, user.Email)
-	   if !email_match {
-	       context.JSON(http.StatusBadRequest, gin.H{"error": "this email is not part of the school mail network"})
-	       context.Abort()
-	       return
-	   }
-	   if err != nil {
-	       context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	       context.Abort()
-	       return
-	   }
 	*/
 	// Hash the password before saving it to the database
 	if err := user.HashPassword(user.Password); err != nil {
@@ -67,14 +50,18 @@ func RegisterUser(context *gin.Context) {
 	if authenticationRecord.Error != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": authenticationRecord.Error.Error()})
 	}
-	sendFirstVerificationEmail(user.UUID, user.Email)
 
 	// If the user is successfully created, return a success response
 	context.JSON(http.StatusCreated, gin.H{"message": "Successfully created"})
 }
 
 func LoginUser(c *gin.Context) {
-	var request TokenRequest
+    var request struct {
+        Email      string `json:"email"`
+        Password   string `json:"password"`
+        RememberMe bool   `json:"rememberme"`
+    }
+
 	var user models.User
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
