@@ -1,52 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="/css/bulma.css">
+    <style>
+        body, html {
+            height: 100%;
+        }
+        .hero.is-fullheight {
+            background-color: #f5f5f5;
+        }
+        .box {
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1);
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="columns">
-            <div class="column is-half is-offset-one-quarter">
-                <div class="box">
-                    <h1 class="title has-text-centered">Login</h1>
-                    <form id="login-form" action="/auth/login" method="post">
-                        <div class="field">
-                            <label class="label">Email</label>
-                            <div class="control">
-                                <input class="input" type="email" id="email" name="email" placeholder="Your Email" required>
+<section class="hero is-fullheight">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-5-tablet is-4-desktop is-3-widescreen">
+                    <div class="box">
+                        <h1 class="title has-text-centered">Login</h1>
+                        <form id="login-form" action="/auth/login" method="post">
+                            <div class="field">
+                                <label class="label">Email</label>
+                                <div class="control">
+                                    <input class="input" type="email" id="email" name="email" placeholder="Your Email" required>
+                                </div>
                             </div>
-                        </div>
-                        <div class="field">
-                            <label class="label">Password</label>
-                            <div class="control">
-                                <input class="input" type="password" id="password" name="password" placeholder="Your Password" required>
+                            <div class="field">
+                                <label class="label">Password</label>
+                                <div class="control">
+                                    <input class="input" type="password" id="password" name="password" placeholder="Your Password" required>
+                                </div>
                             </div>
-                        </div>
-                        <div class="field">
-                            <div class="control">
-                                <label>
-                                    <input type="checkbox" id="remember_me" name="remember_me" /> Remember Me
+                            <div class="field">
+                                <label class="checkbox">
+                                    <input type="checkbox" id="remember_me" name="remember_me">
+                                    Remember Me
                                 </label>
                             </div>
-                        </div>
-                        <div class="field">
-                            <div class="control">
+                            <div class="field">
                                 <button class="button is-primary is-fullwidth" type="submit">Login</button>
                             </div>
-                        </div>
-                        <div class="has-text-centered">
-                            <p>Don't have an account? <a href="/auth/register">Register here</a></p>
-                        </div>
-                    </form>
+                            <div class="has-text-centered">
+                                <p>Don't have an account? <a href="/auth/register">Register here</a></p>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+</section>
 
-    <script src="/js/auth/login.js"></script>
+<script src="/js/auth/login.js"></script>
 </body>
 </html>
-

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"lehrium-backend/internal/server"
 	"fmt"
+	"lehrium-backend/internal/server"
 )
 
 func main() {

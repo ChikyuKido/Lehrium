@@ -1,11 +1,11 @@
 package server
 
 import (
-    "lehrium-backend/internal/controller"
-    "lehrium-backend/internal/middleware"
-    "net/http"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"lehrium-backend/internal/controller"
+	"lehrium-backend/internal/middleware"
+	"net/http"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -16,23 +16,23 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
 	r.Use(cors.New(config))
 
-    auth := r.Group("/auth")
-    test := r.Group("/test").Use(middlewares.Auth())
-    user := r.Group("/user").Use(middlewares.Auth())
-    teacher :=r.Group("/teacher").Use(middlewares.Auth())
+	auth := r.Group("/auth")
+	test := r.Group("/test").Use(middlewares.Auth())
+	user := r.Group("/user").Use(middlewares.Auth())
+	teacher := r.Group("/teacher").Use(middlewares.Auth())
 
 	r.GET("/health", s.healthHandler)
-    
-    auth.POST("/login", controllers.LoginUser)
-    auth.POST("/register", controllers.RegisterUser)
 
-    user.GET("/comment", nil)
-    user.GET("/rate", nil)
+	auth.POST("/login", controllers.LoginUser)
+	auth.POST("/register", controllers.RegisterUser)
 
-    teacher.GET("/list", nil)
-    teacher.GET("/:id", nil)
+	user.GET("/comment", nil)
+	user.GET("/rate", nil)
 
-    test.GET("/ping", s.pong)
+	teacher.GET("/list", nil)
+	teacher.GET("/:id", nil)
+
+	test.GET("/ping", s.pong)
 	return r
 }
 func (s *Server) healthHandler(c *gin.Context) {
@@ -40,5 +40,5 @@ func (s *Server) healthHandler(c *gin.Context) {
 }
 
 func (s *Server) pong(c *gin.Context) {
-    c.JSON(http.StatusOK, gin.H{"message": "pong"})
+	c.JSON(http.StatusOK, gin.H{"message": "pong"})
 }

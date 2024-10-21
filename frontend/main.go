@@ -99,8 +99,6 @@ func main() {
 	servePage("/", "./sites/index.html", sitesGroup)
 	servePage("/auth/login", "./sites/auth/login.html", sitesGroup)
 	servePage("/auth/register", "./sites/auth/register.html", sitesGroup)
-	servePage("/auth/succesfullLogin", "./sites/auth/succesfullLogin.html", sitesGroup)
-	servePage("/auth/succesfullRegister", "./sites/auth/succesfullRegister.html", sitesGroup)
 	servePage("/teachers", "./sites/teacher/teachers.html", sitesGroup)
 	servePage("/teacher/:id", "./sites/auth/teacher.html", sitesGroup)
 	//	servePage("/admin/dashboard", "./sites/admin/dashboard.html", sitesGroup) //TODO: optional
