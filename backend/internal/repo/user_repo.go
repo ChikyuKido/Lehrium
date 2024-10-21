@@ -1,15 +1,17 @@
 package repo
 
 import (
+	"fmt"
 	"lehrium-backend/internal/database"
 	"lehrium-backend/internal/models"
 	"regexp"
 )
 
 func DoesUserByEmailExists(email string) bool {
-	var count int64
-	if err := database.New().Instance().Where("email = ?", email).Count(&count).Error; err != nil {
-		return true
+    var count int64 = 0
+	if err := database.New().Instance().Model(models.User{}).Where("email = ?", email).Count(&count).Error; err != nil {
+		fmt.Println(err)
+        return true
 	}
 	return count != 0
 }
