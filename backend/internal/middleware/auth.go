@@ -1,9 +1,10 @@
 package middlewares
 
 import (
-  "lehrium-backend/internal/auth"
-  "github.com/gin-gonic/gin"
-  "strings"
+	"lehrium-backend/internal/auth"
+	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Auth() gin.HandlerFunc{
@@ -32,6 +33,6 @@ func Auth() gin.HandlerFunc{
             return
         }
 
-        context.Next()  
+        context.Next()
     }
 }

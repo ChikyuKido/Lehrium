@@ -4,15 +4,14 @@ import (
 	"lehrium-backend/internal/auth"
 	"lehrium-backend/internal/database"
 	"lehrium-backend/internal/models"
+	"lehrium-backend/internal/repo"
 	"net/http"
 	"time"
 
-	//    "regexp"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	_ "github.com/joho/godotenv/autoload"
 )
-
 
 func RegisterUser(context *gin.Context) {
 	var user models.User
@@ -23,7 +22,6 @@ func RegisterUser(context *gin.Context) {
 
 	userAuth.UserID = user.ID
 	userAuth.ExpDate = time.Now().Add(time.Minute * 5).String()
-	// Bind the incoming JSON data to the user struct
 	if err := context.ShouldBindJSON(&user); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		context.Abort()
@@ -31,8 +29,13 @@ func RegisterUser(context *gin.Context) {
 	}
 	// check auf Email Domain
 	/*
+		match, err := repo.CheckForEmailDomain(user.Email)
+		if err != nil || !match {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err})
+			context.Abort()
+			return
+		}
 	*/
-	// Hash the password before saving it to the database
 	if err := user.HashPassword(user.Password); err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		context.Abort()
@@ -40,7 +43,7 @@ func RegisterUser(context *gin.Context) {
 	}
 
 	// Create the new user usersRecord in the database
-	usersRecord := database.New().Instance().Create(&user) // Get the instance from the database package and save the user
+	usersRecord := database.New().Instance().Create(&user)
 	if usersRecord.Error != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": usersRecord.Error.Error()})
 		context.Abort()
@@ -51,32 +54,30 @@ func RegisterUser(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"error": authenticationRecord.Error.Error()})
 	}
 
-	// If the user is successfully created, return a success response
 	context.JSON(http.StatusCreated, gin.H{"message": "Successfully created"})
 }
 
 func LoginUser(c *gin.Context) {
-    var request struct {
-        Email      string `json:"email"`
-        Password   string `json:"password"`
-        RememberMe bool   `json:"rememberme"`
-    }
+	var request struct {
+		Email      string `json:"email"`
+		Password   string `json:"password"`
+		RememberMe bool   `json:"rememberme"`
+	}
 
-	var user models.User
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		c.Abort()
 		return
 	}
 
-	usersRecord := database.New().Instance().Where("email = ?", request.Email).First(&user)
-	if usersRecord.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": usersRecord.Error.Error()})
+	user, err := repo.GetUser(request.Email)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		c.Abort()
 		return
 	}
-	credentialError := user.CheckPassword(request.Password)
-	if credentialError != nil {
+
+	if err := user.CheckPassword(request.Password); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		c.Abort()
 		return
