@@ -23,6 +23,14 @@ func CreateNewUser(email, password, untisName string) error {
 	return database.New().Instance().Create(&user).Error
 }
 
+func GetAuthEntry(userid uint) (models.Verification, error){
+    var verification models.Verification
+	if err := database.New().Instance().Where("user_id = ?", userid).First(&verification).Error; err != nil {
+        return verification, err
+    }
+    return verification, nil
+}
+
 func GetUser(email string) (models.User, error) {
 	var user models.User
 	if err := database.New().Instance().Where("email = ?", email).First(&user).Error; err != nil {

@@ -4,14 +4,53 @@ import (
 	"fmt"
 	"lehrium-backend/internal/database"
 	"lehrium-backend/internal/models"
-	"log"
+	"lehrium-backend/internal/repo"
 	"net/http"
-	"net/smtp"
-	"os"
 	"time"
+    "log"
+    "net/smtp"
+    "os"
 
 	"github.com/gin-gonic/gin"
 )
+
+func SendVerificationEmail(c *gin.Context) {
+    var user models.User
+    if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Abort()
+		return
+	}
+
+    var verification models.Verification
+    verification, err := repo.GetAuthEntry(user.ID)
+    if err != nil {
+        log.Panicln("failed to retrieve authentication record")
+    }
+    
+    from := os.Getenv("GMAIL_USERNAME")
+	pass := os.Getenv("GMAIL_APPPASSWORD")
+    baseurl := os.Getenv("BASE_URL")
+    smtpServerUrl := os.Getenv("SMTP_SERVER")
+    smtpServerPort := os.Getenv("SMTP_PORT")
+	to := user.Email
+
+	msg := "From: Lehrium Verification" + "\n" +
+		"To: " + to + "\n" +
+		"Subject: Lehrium Account verification\n\n" +
+		"please verify your account via this link: \n" +
+		"https://" + baseurl + "/auth/verifyEmail?uuid=" + verification.UUID
+
+        err = smtp.SendMail(fmt.Sprintf("%s:%s",smtpServerUrl, smtpServerPort),
+		smtp.PlainAuth("", from, pass, smtpServerUrl),
+		from, []string{to}, []byte(msg))
+
+	if err != nil {
+		log.Printf("smtp error: %s", err)
+		return
+	}
+	log.Println("Successfully sended to " + to)
+}
 
 func VerifyEmail(c *gin.Context) {
 	var user models.User
@@ -56,37 +95,4 @@ func VerifyEmail(c *gin.Context) {
 	}
 	database.New().Instance().Model(&models.User{}).Where("email = ?", user.Email).Update("isVerified", true)
 	return
-}
-
-func SendVerificationEmail(uuid string, email string) {
-	from := os.Getenv("GMAIL_USERNAME")
-	pass := os.Getenv("GMAIL_APPPASSWORD")
-	to := email
-
-	msg := "From: Lehrium Verification" + "\n" +
-		"To: " + to + "\n" +
-		"Subject: Lehrium Account verification\n\n" +
-		"please verify your account via this link: \n" +
-		"https://lehrium.elekius.at/auth/verifyEmail?uuid=" + uuid
-
-	err := smtp.SendMail("smtp.gmail.com:587",
-		smtp.PlainAuth("", from, pass, "smtp.gmail.com"),
-		from, []string{to}, []byte(msg))
-
-	if err != nil {
-		log.Printf("smtp error: %s", err)
-		return
-	}
-	log.Println("Successfully sended to " + to)
-}
-
-// updates ExpirationDate with current Time + 5 Minutes
-func updateVerificationEmailDate(uuid string) {
-	var user models.User
-
-	usersRecord := database.New().Instance().Where("uuid = ?", uuid).First(&user)
-	if usersRecord.Error != nil {
-		return
-	}
-	database.New().Instance().Model(&models.Verification{}).Where("user_id = ?", user.ID).Update("exp_date", time.Now().Add(5*time.Minute).String())
 }

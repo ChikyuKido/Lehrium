@@ -27,7 +27,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	auth.POST("/login", controller.LoginUser)
 	auth.POST("/register", controller.RegisterUser)
 	auth.POST("/verifyEmail", controller.VerifyEmail)
-	//auth.POST("/requestEmailVerification", controller.SendNewVerificationEmail)
+	auth.POST("/requestEmailVerification", controller.SendVerificationEmail)
 
 	user.GET("/comment", nil)
 	user.GET("/rate", nil)
