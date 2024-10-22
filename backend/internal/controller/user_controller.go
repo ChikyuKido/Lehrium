@@ -7,23 +7,22 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 func RegisterUser(context *gin.Context) {
 	var user models.User
-	
-    if err := context.ShouldBindJSON(&user); err != nil {
+
+	if err := context.ShouldBindJSON(&user); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		context.Abort()
 		return
 	}
 
-    if repo.DoesUserByEmailExists(user.Email){
-        context.JSON(http.StatusBadRequest, gin.H{"error": "User with this email already exists"})
-        context.Abort()
-        return
-    }
+	if repo.DoesUserByEmailExists(user.Email) {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "User with this email already exists"})
+		context.Abort()
+		return
+	}
 
 	if err := user.HashPassword(user.Password); err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -31,8 +30,7 @@ func RegisterUser(context *gin.Context) {
 		return
 	}
 
-    repo.CreateNewUser(user.Email, user.Password, user.UntisName)
-    repo.CreateNewAuthenticationRecord(user.ID, uuid.NewString())
+	repo.CreateNewUser(user.Email, user.Password, user.UntisName)
 
 	context.JSON(http.StatusCreated, gin.H{"message": "Successfully created"})
 }
