@@ -17,7 +17,7 @@ type Service interface {
 	// Health returns a map of health status information.
 	Health() map[string]string
 
-	Instance() *gorm.DB
+    Instance() *gorm.DB
 
 	// Close terminates the database connection.
 	Close() error
@@ -49,19 +49,20 @@ func New() Service {
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
+    
+    err = db.AutoMigrate(&models.User{}, &models.Comment{}, &models.Rating{}, &models.Teacher{}, &models.Verification{})
+    if err != nil {
+        log.Fatalf("Failed to migrate database: %v", err)
+    }
 
-	err = db.AutoMigrate(&models.User{})
-	if err != nil {
-		log.Fatalf("Failed to migrate database: %v", err)
-	}
-	dbInstance = &service{
+    dbInstance = &service{
 		db: db,
 	}
 	return dbInstance
 }
 
 func (s *service) Instance() *gorm.DB {
-	return s.db
+    return s.db
 }
 
 // Health checks the health of the database connection by pinging the database.
@@ -128,3 +129,4 @@ func (s *service) Close() error {
 	log.Printf("Disconnected from database: %s", database)
 	return sqlDB.Close()
 }
+

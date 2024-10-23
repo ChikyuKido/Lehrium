@@ -13,8 +13,8 @@ import (
 var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 type JWTClaim struct {
-	UntisName string `json:"untisName"`
-	Email     string `json:"email"`
+	//UntisName string `json:"untisName"`
+	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
@@ -34,7 +34,7 @@ func GenerateJWT(email string, persistantLogin bool) (tokenString string, err er
 	return
 }
 
-func ValidateToken(signedToken string) (err error) {
+func ValidateToken(signedToken string) (*JWTClaim, error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&JWTClaim{},
@@ -43,16 +43,16 @@ func ValidateToken(signedToken string) (err error) {
 		},
 	)
 	if err != nil {
-		return
+		return nil, err
 	}
 	claims, ok := token.Claims.(*JWTClaim)
 	if !ok {
 		err = errors.New("couldn't parse claims")
-		return
+		return nil, err
 	}
 	if claims.ExpiresAt < time.Now().Local().Unix() {
 		err = errors.New("token expired")
-		return
+		return nil, err
 	}
-	return
+	return claims, nil
 }
