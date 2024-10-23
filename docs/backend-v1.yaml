@@ -103,7 +103,7 @@ paths:
         '200':
           description: Successfully verified the email and activated the account
         '400':
-          description: Bad request. User with uuid does not exists or email verification link expired
+          description: Bad request. Uuid does not exists or email verification link expired
   /auth/requestEmailVerification:
     post:
       summary: Sends the logged in user a email with a verification link
