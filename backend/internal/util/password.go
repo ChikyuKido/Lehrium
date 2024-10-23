@@ -1,20 +1,21 @@
-package models
+package util
 
 import (
+	"lehrium-backend/internal/models"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
 
-func (user *User) HashPassword(password string) error {
+func HashPassword(password string) (hashedPassword string, err error) {
   bytes, err := bcrypt.GenerateFromPassword([]byte(password), 7)
   if err != nil {
-    return err
+    return "", err
   }
-  user.Password = string(bytes)
-  return nil
+  return string(bytes), nil
 }
 
-func (user *User) CheckPassword(providedPassword string) error {
+func CheckPassword(user models.User, providedPassword string) error {
   err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
   if err != nil {
     return err

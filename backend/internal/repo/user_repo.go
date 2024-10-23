@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"lehrium-backend/internal/database"
 	"lehrium-backend/internal/models"
-	"regexp"
 )
 
 func DoesUserByEmailExists(email string) bool {
@@ -41,13 +40,3 @@ func GetUser(email string) (models.User, error) {
 	return user, nil
 }
 
-func CheckForEmailDomain(email string) (bool, error) {
-	email_match, err := regexp.MatchString(`@spengergasse\.at$`, email)
-	if !email_match {
-		return false, nil
-	}
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}

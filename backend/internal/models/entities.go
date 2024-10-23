@@ -54,5 +54,5 @@ type Verification struct {
     gorm.Model
     UserID  uint
     UUID    string
-    ExpDate string
+    ExpDate int64
 }

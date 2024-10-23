@@ -2,35 +2,42 @@ package controller
 
 import (
 	"lehrium-backend/internal/auth"
-	"lehrium-backend/internal/models"
 	"lehrium-backend/internal/repo"
+	"lehrium-backend/internal/util"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterUser(context *gin.Context) {
-	var user models.User
+	var request struct {
+		Email       string `json:"email"`
+		Password    string `json:"password"`
+		UntisName   string `json:"untisName"`
+	}
 
-	if err := context.ShouldBindJSON(&user); err != nil {
+	if err := context.ShouldBindJSON(&request); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		context.Abort()
 		return
 	}
 
-	if repo.DoesUserByEmailExists(user.Email) {
+	if repo.DoesUserByEmailExists(request.Email) {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "User with this email already exists"})
 		context.Abort()
 		return
 	}
 
-	if err := user.HashPassword(user.Password); err != nil {
+	hashedPassword, err := util.HashPassword(request.Password)
+    if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		context.Abort()
 		return
 	}
 
-	repo.CreateNewUser(user.Email, user.Password, user.UntisName)
+    request.Password = hashedPassword
+
+	repo.CreateNewUser(request.Email, request.Password, request.UntisName)
 
 	context.JSON(http.StatusCreated, gin.H{"message": "Successfully created"})
 }
@@ -55,7 +62,7 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	if err := user.CheckPassword(request.Password); err != nil {
+	if err := util.CheckPassword(user, request.Password); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		c.Abort()
 		return

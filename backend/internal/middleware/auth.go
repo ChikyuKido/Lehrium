@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"lehrium-backend/internal/auth"
+	"lehrium-backend/internal/repo"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -31,7 +32,9 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		context.Set("email", claims.Email)
+        user, err := repo.GetUser(claims.Email)
+
+        context.Set("user", user)
 
 		context.Next()
 	}
