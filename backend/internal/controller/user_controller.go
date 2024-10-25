@@ -9,37 +9,40 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterUser(context *gin.Context) {
+func RegisterUser(c *gin.Context) {
 	var request struct {
 		Email       string `json:"email"`
 		Password    string `json:"password"`
 		UntisName   string `json:"untisName"`
 	}
 
-	if err := context.ShouldBindJSON(&request); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		context.Abort()
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid body json. Contact the frontend dev"})
+		c.Abort()
 		return
 	}
 
 	if repo.DoesUserByEmailExists(request.Email) {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "User with this email already exists"})
-		context.Abort()
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User with this email already exists"})
+		c.Abort()
 		return
 	}
 
 	hashedPassword, err := util.HashPassword(request.Password)
     if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		context.Abort()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash user password"})
+		c.Abort()
 		return
 	}
 
     request.Password = hashedPassword
 
-	repo.CreateNewUser(request.Email, request.Password, request.UntisName)
+    err = repo.CreateNewUser(request.Email, request.Password, request.UntisName)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create account due to internal error. Try again later"})
+    }
 
-	context.JSON(http.StatusCreated, gin.H{"message": "Successfully created"})
+	c.JSON(http.StatusCreated, gin.H{"message": "Successfully created"})
 }
 
 func LoginUser(c *gin.Context) {
@@ -50,27 +53,27 @@ func LoginUser(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid body json. Contact the frontend dev"})
 		c.Abort()
 		return
 	}
 
 	user, err := repo.GetUser(request.Email)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User with provided email does not exists"})
 		c.Abort()
 		return
 	}
 
 	if err := util.CheckPassword(user, request.Password); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		c.Abort()
 		return
 	}
 
 	tokenString, err := auth.GenerateJWT(user.Email, request.RememberMe)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to log in"})
 		c.Abort()
 		return
 	}

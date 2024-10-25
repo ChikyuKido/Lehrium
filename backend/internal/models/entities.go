@@ -43,7 +43,7 @@ type User struct {
     gorm.Model
     Email           string  `json:"email" gorm:"size:255;unique"`
     Password        string  `json:"password" gorm:"size:255"`
-    UntisName       string  `json:"untisName" gorm:"size:100;unique"`
+    UntisName       string  `json:"untisName" gorm:"size:100"`
     Roles           pq.StringArray `gorm:"type:varchar(50)[]"`
     TeacherIDs      pq.Int64Array `gorm:"type:integer[]"`
     Verified        bool    `json:"isVerified" gorm:"type:boolean"`

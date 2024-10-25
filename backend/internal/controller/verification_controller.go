@@ -17,28 +17,27 @@ import (
 func SendVerificationEmail(c *gin.Context) {
 	userInterface, exists := c.Get("user")
 	if !exists {
-		c.JSON(401, gin.H{"error": "unauthorized"})
+		c.JSON(401, gin.H{"error": "Unauthorized"})
 		c.Abort()
 		return
 	}
 
     user, ok := userInterface.(models.User)
     if !ok {
-        c.JSON(401, gin.H{"error": "invalid user type"})
+        c.JSON(401, gin.H{"error": "Invalid user type"})
         c.Abort()
         return
     }
 
 	user, err := repo.GetUser(user.Email)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "User with provided email does not exist"})
         c.Abort()
         return
 	}
 
     if repo.CheckIfAuthenticationRecordExists(user.ID){
         if repo.CheckIfAuthenticationDateExpired(user.ID){
-            //todo: delete old entry
             repo.DeleteAuthenticationRecord(user.ID)
         }else {   
             c.JSON(http.StatusInternalServerError, gin.H{"error": "An email verification is already pending"})
@@ -53,7 +52,7 @@ func SendVerificationEmail(c *gin.Context) {
 
 	from := os.Getenv("GMAIL_USERNAME")
 	pass := os.Getenv("GMAIL_APPPASSWORD")
-	baseurl := os.Getenv("BASEURL")
+	baseurl := os.Getenv("FRONTEND_URL")
 	//smtpServerUrl := os.Getenv("SMTP_SERVER")
 	//smtpServerPort := os.Getenv("SMTP_PORT")
 	to := user.Email
@@ -86,14 +85,14 @@ func VerifyEmail(c *gin.Context) {
 
 	verificationRecord := database.New().Instance().Where("uuid = ?", uuid).First(&verification)
 	if verificationRecord.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": verificationRecord.Error})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get users verification info"})
 		c.Abort()
 		return
 	}
 
     userRecord := database.New().Instance().Where("id = ?", verification.UserID).First(&user)
     if userRecord.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": userRecord.Error})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get user"})
         c.Abort()
         return
     }
@@ -107,7 +106,7 @@ func VerifyEmail(c *gin.Context) {
 
     err := repo.VerifyUser(verification, user)
     if err != nil {
-        c.JSON(400, gin.H{"error": err})
+        c.JSON(400, gin.H{"error": "failed to verify user"})
         c.Abort()
         return
     }
