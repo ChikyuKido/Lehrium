@@ -24,7 +24,7 @@ func SendVerificationEmail(c *gin.Context) {
 
     user, ok := userInterface.(models.User)
     if !ok {
-        c.JSON(401, gin.H{"error": "Internal Error"})
+        c.JSON(500, gin.H{"error": "Internal Error"})
         c.Abort()
         return
     }
