@@ -40,3 +40,11 @@ func GetUser(email string) (models.User, error) {
 	return user, nil
 }
 
+func GetUserById(id uint) (models.User, error){
+    var user models.User
+    userRecord := database.New().Instance().Where("id = ?", id).First(&user)
+    if userRecord.Error != nil {
+        return user, userRecord.Error
+    }
+    return user, nil
+}

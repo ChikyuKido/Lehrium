@@ -58,3 +58,13 @@ func CheckIfAuthenticationDateExpired(userid uint) bool{
 func DeleteAuthenticationRecord(userid uint){
     database.New().Instance().Delete(models.Verification{UserID: userid})
 }
+
+func GetVerificationByUUID(uuid string) (models.Verification, error){
+    var verification = models.Verification{}
+
+	verificationRecord := database.New().Instance().Where("uuid = ?", uuid).First(&verification)
+	if verificationRecord.Error != nil {
+		return verification, verificationRecord.Error
+	}
+    return verification, nil
+}
