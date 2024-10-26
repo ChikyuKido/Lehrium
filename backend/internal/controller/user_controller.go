@@ -60,7 +60,7 @@ func LoginUser(c *gin.Context) {
 
 	user, err := repo.GetUser(request.Email)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "User with provided email does not exists"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid credentials"})
 		c.Abort()
 		return
 	}

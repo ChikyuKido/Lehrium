@@ -24,7 +24,7 @@ func SendVerificationEmail(c *gin.Context) {
 
     user, ok := userInterface.(models.User)
     if !ok {
-        c.JSON(401, gin.H{"error": "Invalid user type"})
+        c.JSON(401, gin.H{"error": "Internal Error"})
         c.Abort()
         return
     }
@@ -75,23 +75,21 @@ func SendVerificationEmail(c *gin.Context) {
 }
 
 func VerifyEmail(c *gin.Context) {
-	var user models.User
-	var verification models.Verification
-
 	uuid := c.Query("uuid")
 	if uuid == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "no UUID provided"})
 	}
 
-	verificationRecord := database.New().Instance().Where("uuid = ?", uuid).First(&verification)
-	if verificationRecord.Error != nil {
+
+    verification, err := repo.GetVerificationByUUID(uuid)
+    if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get users verification info"})
 		c.Abort()
 		return
-	}
+    }
 
-    userRecord := database.New().Instance().Where("id = ?", verification.UserID).First(&user)
-    if userRecord.Error != nil {
+    user, err := repo.GetUserById(verification.ID)
+    if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get user"})
         c.Abort()
         return
@@ -104,12 +102,10 @@ func VerifyEmail(c *gin.Context) {
         return
     }
 
-    err := repo.VerifyUser(verification, user)
+    err = repo.VerifyUser(verification, user)
     if err != nil {
         c.JSON(400, gin.H{"error": "failed to verify user"})
         c.Abort()
         return
     }
-
-	return
 }
