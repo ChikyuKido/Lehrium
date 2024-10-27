@@ -9,17 +9,17 @@ import (
 )
 
 func Auth() gin.HandlerFunc {
-	return func(context *gin.Context) {
-		tokenString := context.GetHeader("Authorization")
+	return func(c *gin.Context) {
+		tokenString := c.GetHeader("Authorization")
 		if tokenString == "" {
-			context.JSON(401, gin.H{"error": "request does not contain an access token"})
-			context.Abort()
+			c.JSON(401, gin.H{"error": "request does not contain an access token"})
+			c.Abort()
 			return
 		}
 
 		if !strings.HasPrefix(tokenString, "Bearer ") {
-			context.JSON(401, gin.H{"error": "invalid authorization header format"})
-			context.Abort()
+			c.JSON(401, gin.H{"error": "invalid authorization header format"})
+			c.Abort()
 			return
 		}
 
@@ -27,15 +27,15 @@ func Auth() gin.HandlerFunc {
 
 		claims, err := auth.ValidateToken(tokenString)
 		if err != nil {
-			context.JSON(401, gin.H{"error": err.Error()})
-			context.Abort()
+			c.JSON(401, gin.H{"error": err.Error()})
+			c.Abort()
 			return
 		}
 
         user, err := repo.GetUser(claims.Email)
 
-        context.Set("user", user)
+        c.Set("user", user)
 
-		context.Next()
+		c.Next()
 	}
 }
