@@ -1,10 +1,12 @@
+const API_BASE_URL = "{{ .ApiBaseUrl }}"
+
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const uuid = urlParams.get('uuid');
 
     if (uuid) {
         console.log('UUID:', uuid);
-        fetch('http://localhost:8080/api/v1/auth/verifyEmail?uuid=' + uuid, {
+        fetch(API_BASE_URL+'/api/v1/auth/verifyEmail?uuid=' + uuid, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

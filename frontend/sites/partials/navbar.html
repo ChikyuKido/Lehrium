@@ -1,0 +1,33 @@
+{{ define "navbar" }}
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+            <img src="/imgs/navbar_logo.webp" alt="Lehrium Logo" width="60" height="60">
+            <strong>Lehrium</strong>
+        </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+            <a class="navbar-item" href="/teachers">
+                Teachers
+            </a>
+        </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-primary" href="/auth/register">
+                        <strong>Sign up</strong>
+                    </a>
+                    <a class="button is-light" href="/auth/login">
+                        Log in
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script src="/js/partials/navbar.js"></script>
+{{ end }}

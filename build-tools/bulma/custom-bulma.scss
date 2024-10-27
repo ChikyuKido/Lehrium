@@ -1,25 +1,25 @@
-// Define custom color palette
-$orange: #ff6600;
-$orange-light: #ffa64d;
-$orange-dark: #cc5200;
-$gold: #ffd700;
-$bronze: #cd7f32;
-$peach: #ffcc99;
-$terracotta: #e2725b;
-$white: #ffffff;
-$grey-dark: #4a4a4a;
+$background-dark: #121212; // Main background
+$vibrant-blue: #1E88E5; // Bright blue
+$cyan: #00BCD4; // Clean cyan
+$blue-light: #64B5F6; // Soft light blue
+$blue-dark: #0D47A1; // Dark blue
+$cyan-light: #4DD0E1; // Light cyan
+$cyan-dark: #00838F; // Dark cyan
+$white: #FFFFFF; // Text color
+$grey: #BDBDBD; // Muted elements
+$grey-dark: #424242; // Secondary elements
 
 @use "sass/index" with (
-  $primary: $orange,
-  
-  $link: $bronze,
-  $info: $peach,
-  $success: $gold,
-  $warning: $terracotta,
-  $danger: $orange-dark,
+  $primary: $vibrant-blue,
+
+  $link: $cyan,
+  $info: $cyan-light,
+  $success: $blue-dark,
+  $warning: $blue-light,
+  $danger: $cyan-dark,
 
   $grey: $grey-dark,
-  $grey-light: $peach,
+  $grey-light: $grey,
 
-  $background: $white
+  $background: $background-dark
 );
