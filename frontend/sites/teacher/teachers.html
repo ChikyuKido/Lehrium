@@ -1,11 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="/css/bulma.css">
+    <link rel="stylesheet" href="/css/dual_slider.css">
+    <style>
+        .search-bar-container {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .search-bar {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+
+        .filter-menu {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 0.5rem;
+        }
+
+        .filter-menu.active {
+            display: block;
+        }
+    </style>
+    <style>
+        .image-placeholder {
+            width: 100%;
+            height: 200px;
+            background-color: #dcdcdc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #555;
+            border-radius: 10px 10px 0 0;
+        }
+        .stars {
+            display: flex;
+            align-items: center;
+        }
+        .star {
+            fill: gold;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+        .star-gray {
+            fill: lightgray;
+            opacity: 0.5;
+        }
+    </style>
 </head>
 <body>
 {{ template "navbar" . }}
+<section class="section">
+    <div class="container">
+        <div class="search-bar-container">
+            <div class="field has-addons search-bar">
+                <div class="control is-expanded">
+                    <input class="input" type="text" placeholder="Search..." aria-label="Search input">
+                </div>
+                <div class="control">
+                    <button id="filterToggleButton" class="button is-primary">
+                        Filters
+                    </button>
+                </div>
+            </div>
+
+            <div id="filterMenu" class="box filter-menu">
+                <div class="field">
+                    <label class="label">Rating</label>
+                    {{template "dual_slider" .SliderData}}
+                </div>
+
+                <div class="field">
+                    <label class="label">Sort by</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select aria-label="Sort by options">
+                                <option value="name">Name</option>
+                                <option value="rating">Rating</option>
+                                <option value="date">Date</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="container mt-5">
+    <div class="columns is-multiline" id="teacher_cards">
+
+    </div>
+</div>
+<script src="/js/teacher/teachers.js"></script>
 </body>
 </html>

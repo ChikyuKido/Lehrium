@@ -1,0 +1,7 @@
+{{ define "dual_slider" }}
+<div class="slider-wrapper">
+    <input id="minSlider" type="range" min="{{ .Min }}" max="{{ .Max }}" value="{{ .InitialMin }}" step="1">
+    <input id="maxSlider" type="range" min="{{ .Min }}" max="{{ .Max }}" value="{{ .InitialMax }}" step="1">
+</div>
+<script src="/js/partials/dual_slider.js"></script>
+{{ end }}

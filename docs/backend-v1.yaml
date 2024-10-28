@@ -268,6 +268,12 @@ paths:
                     name:
                       type: string
                       description: The name of the teacher.
+                    shortName:
+                      type: string
+                      description: The shortname of the teacher like TSI.
+                    amountComments:
+                      type: number
+                      description: The amount of comments the teacher has.
                     imageUrl:
                       type: string
                       description: URL of the teacher's profile picture.

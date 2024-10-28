@@ -21,6 +21,14 @@ var (
 	debug      = true
 )
 
+func unescapeJavaScript(content []byte) []byte {
+	strContent := string(content)
+	strContent = strings.ReplaceAll(strContent, "&lt;", "<")
+	strContent = strings.ReplaceAll(strContent, "&gt;", ">")
+	strContent = strings.ReplaceAll(strContent, "&amp;", "&")
+	return []byte(strContent)
+}
+
 func getTemplateFiles(directory string) []string {
 	var files []string
 	err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
@@ -53,26 +61,34 @@ func getCachedContent(path string, filepath string, data any) []byte {
 			fmt.Printf("Failed to parse template %v", err)
 			return nil
 		}
+
 		err = t.Execute(byteBuffer, data)
 		if err != nil {
 			fmt.Printf("Failed to execute template %v", err)
 			return nil
 		}
 		content = byteBuffer.Bytes()
+		if strings.HasSuffix(filepath, ".js") {
+			content = unescapeJavaScript(content)
+		}
 	} else {
 		content, _ = os.ReadFile(filepath)
 	}
-	var compressedContent bytes.Buffer
-	writer, _ := gzip.NewWriterLevel(&compressedContent, gzip.BestCompression)
-	_, err := writer.Write(content)
-	if err != nil {
-		return nil
-	}
-	writer.Close()
+	if !strings.Contains(filepath, "imgs") {
+		var compressedContent bytes.Buffer
+		writer, _ := gzip.NewWriterLevel(&compressedContent, gzip.BestCompression)
+		_, err := writer.Write(content)
+		if err != nil {
+			return nil
+		}
+		writer.Close()
 
-	compressedData := compressedContent.Bytes()
-	cache[path] = compressedData
-	return compressedData
+		compressedData := compressedContent.Bytes()
+		cache[path] = compressedData
+	} else {
+		cache[path] = content
+	}
+	return cache[path]
 }
 
 func serveDirectory(rootPath string, baseDir string, r *gin.RouterGroup, data any) {
@@ -92,7 +108,10 @@ func servePage(path string, diskPath string, r *gin.RouterGroup, data any) {
 	r.GET(path, func(c *gin.Context) {
 		content := getCachedContent(path, diskPath, data)
 		contentType := mime.TypeByExtension(filepath.Ext(diskPath))
-		c.Header("Content-Encoding", "gzip")
+		// compress everything except images
+		if !strings.Contains(diskPath, "imgs") {
+			c.Header("Content-Encoding", "gzip")
+		}
 		if !debug && filepath.Ext(diskPath) == ".css" {
 			c.Header("Cache-Control", "public, max-age=3600")
 		}
@@ -106,6 +125,13 @@ func getEnvOrDefault(key string, def string) string {
 		return def
 	}
 	return val
+}
+
+type SliderData struct {
+	Min        int
+	Max        int
+	InitialMin int
+	InitialMax int
 }
 
 func main() {
@@ -134,8 +160,19 @@ func main() {
 	servePage("/auth/register", "./sites/auth/register.html", sitesGroup, nil)
 	servePage("/auth/verifyEmail", "./sites/auth/verifyEmail.html", sitesGroup, nil)
 
-	servePage("/teachers", "./sites/teacher/teachers.html", sitesGroup, nil)
-	servePage("/teacher/:id", "./sites/auth/teacher.html", sitesGroup, nil)
+	var teachersPageData struct {
+		SliderData SliderData
+	}
+	slider := SliderData{
+		Min:        1,
+		Max:        10,
+		InitialMin: 1,
+		InitialMax: 10,
+	}
+	teachersPageData.SliderData = slider
+
+	servePage("/teachers", "./sites/teacher/teachers.html", sitesGroup, teachersPageData)
+	servePage("/teacher/:id", "./sites/teacher/teacher.html", sitesGroup, nil)
 	//	servePage("/admin/dashboard", "./sites/admin/dashboard.html", sitesGroup) //TODO: optional
 
 	fmt.Println("Starting on port " + portVal)
