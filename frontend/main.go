@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"html/template"
 	"io/fs"
 	"mime"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -91,7 +91,7 @@ func getCachedContent(path string, filepath string, data any) []byte {
 	return cache[path]
 }
 
-func serveDirectory(rootPath string, baseDir string, r *gin.RouterGroup, data any) {
+func serveDirectory(rootPath string, baseDir string, data any) {
 	filepath.Walk(baseDir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -99,23 +99,27 @@ func serveDirectory(rootPath string, baseDir string, r *gin.RouterGroup, data an
 		if !info.IsDir() {
 			relativePath, _ := filepath.Rel(baseDir, path)
 			urlPath := rootPath + relativePath
-			servePage(urlPath, path, r, data)
+			servePage(urlPath, path, data)
 		}
 		return nil
 	})
 }
-func servePage(path string, diskPath string, r *gin.RouterGroup, data any) {
-	r.GET(path, func(c *gin.Context) {
+func servePage(path string, diskPath string, data any) {
+	http.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		content := getCachedContent(path, diskPath, data)
 		contentType := mime.TypeByExtension(filepath.Ext(diskPath))
-		// compress everything except images
+
+		// Compress everything except images
 		if !strings.Contains(diskPath, "imgs") {
-			c.Header("Content-Encoding", "gzip")
+			w.Header().Set("Content-Encoding", "gzip")
 		}
 		if !debug && filepath.Ext(diskPath) == ".css" {
-			c.Header("Cache-Control", "public, max-age=3600")
+			w.Header().Set("Cache-Control", "public, max-age=3600")
 		}
-		c.Data(200, contentType, content)
+
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", contentType)
+		w.Write(content)
 	})
 }
 
@@ -149,16 +153,14 @@ func main() {
 	}
 	settings.ApiBaseUrl = "http://localhost:8080"
 
-	r := gin.Default()
-	sitesGroup := r.Group("/")
-	serveDirectory("/css/", "./css", sitesGroup, nil)
-	serveDirectory("/js/", "./js", sitesGroup, settings)
-	serveDirectory("/", "./sites", sitesGroup, nil)
-	serveDirectory("/imgs/", "./imgs", sitesGroup, nil)
-	servePage("/", "./sites/index.html", sitesGroup, nil)
-	servePage("/auth/login", "./sites/auth/login.html", sitesGroup, nil)
-	servePage("/auth/register", "./sites/auth/register.html", sitesGroup, nil)
-	servePage("/auth/verifyEmail", "./sites/auth/verifyEmail.html", sitesGroup, nil)
+	serveDirectory("/css/", "./css", nil)
+	serveDirectory("/js/", "./js", settings)
+	serveDirectory("/", "./sites", nil)
+	serveDirectory("/imgs/", "./imgs", nil)
+	servePage("/", "./sites/index.html", nil)
+	servePage("/auth/login", "./sites/auth/login.html", nil)
+	servePage("/auth/register", "./sites/auth/register.html", nil)
+	servePage("/auth/verifyEmail", "./sites/auth/verifyEmail.html", nil)
 
 	var teachersPageData struct {
 		SliderData SliderData
@@ -171,10 +173,12 @@ func main() {
 	}
 	teachersPageData.SliderData = slider
 
-	servePage("/teachers", "./sites/teacher/teachers.html", sitesGroup, teachersPageData)
-	servePage("/teacher/:id", "./sites/teacher/teacher.html", sitesGroup, nil)
+	servePage("/teachers", "./sites/teacher/teachers.html", teachersPageData)
+	servePage("/teacher/:id", "./sites/teacher/teacher.html", nil)
 	//	servePage("/admin/dashboard", "./sites/admin/dashboard.html", sitesGroup) //TODO: optional
 
 	fmt.Println("Starting on port " + portVal)
-	r.Run(fmt.Sprintf(":%s", portVal))
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", portVal), nil); err != nil {
+		fmt.Println("Error starting server:", err)
+	}
 }
