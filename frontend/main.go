@@ -113,9 +113,9 @@ func servePage(path string, diskPath string, data any) {
 		if !strings.Contains(diskPath, "imgs") {
 			w.Header().Set("Content-Encoding", "gzip")
 		}
-		if !debug && filepath.Ext(diskPath) == ".css" {
-			w.Header().Set("Cache-Control", "public, max-age=3600")
-		}
+		//if !debug && filepath.Ext(diskPath) == ".css" {
+		//	w.Header().Set("Cache-Control", "public, max-age=3600")
+		//}
 
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", contentType)
