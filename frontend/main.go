@@ -2,8 +2,8 @@ package main
 
 import (
 	"bytes"
-	"compress/gzip"
 	"fmt"
+	"github.com/andybalholm/brotli"
 	"html/template"
 	"io/fs"
 	"mime"
@@ -76,7 +76,8 @@ func getCachedContent(path string, filepath string, data any) []byte {
 	}
 	if !strings.Contains(filepath, "imgs") {
 		var compressedContent bytes.Buffer
-		writer, _ := gzip.NewWriterLevel(&compressedContent, gzip.BestCompression)
+		//writer, _ := gzip.NewWriterLevel(&compressedContent, gzip.BestCompression)
+		writer := brotli.NewWriterLevel(&compressedContent, brotli.BestCompression)
 		_, err := writer.Write(content)
 		if err != nil {
 			return nil
@@ -111,7 +112,7 @@ func servePage(path string, diskPath string, data any) {
 
 		// Compress everything except images
 		if !strings.Contains(diskPath, "imgs") {
-			w.Header().Set("Content-Encoding", "gzip")
+			w.Header().Set("Content-Encoding", "br")
 		}
 		//if !debug && filepath.Ext(diskPath) == ".css" {
 		//	w.Header().Set("Cache-Control", "public, max-age=3600")
