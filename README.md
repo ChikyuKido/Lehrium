@@ -12,12 +12,9 @@ Lehrium is a web-based application that empowers students to give constructive, 
 
 ## Features
 
-- **User Registration**: Separate registration for students and teachers
 - **Anonymous Feedback Submission**: Students can leave anonymous ratings and comments
-- **Feedback Dashboard**: Teachers have access to a dashboard for viewing feedback on their courses
 - **Data Security**: Ensures the privacy and security of all users through encryption and secure storage
-- **Statistical Insights**: Analyze feedback trends with visual insights (optional)
-- **Notification System**: Alerts teachers and school administrators about recurring feedback themes
+
 
 ## Getting Started
 
