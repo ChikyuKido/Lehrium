@@ -1,5 +1,4 @@
 # Lehrium
-# Lehrium
 
 > A Web Platform for Students to Provide Anonymous Feedback on Teachers
 
